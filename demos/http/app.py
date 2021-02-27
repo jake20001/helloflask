@@ -6,6 +6,8 @@
     :license: MIT, see LICENSE for more details.
 """
 import os
+from datetime import timedelta
+
 try:
     from urlparse import urlparse, urljoin
 except ImportError:
@@ -13,10 +15,12 @@ except ImportError:
 
 from jinja2 import escape
 from jinja2.utils import generate_lorem_ipsum
-from flask import Flask, make_response, request, redirect, url_for, abort, session, jsonify
+from flask import Flask, make_response, request, redirect, url_for, abort, session, jsonify, Response
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'secret string')
+app.my_cookie_time = os.getenv('MY_PERMANENT_SESSION_LIFETIME','2')
+app.permanent_session_lifetime = os.getenv('PERMANENT_SESSION_LIFETIME',timedelta(days=int(app.my_cookie_time)))
 
 
 # get name value from query string and cookie
@@ -28,6 +32,8 @@ def hello():
         name = request.cookies.get('name', 'Human')
     response = '<h1>Hello, %s!</h1>' % escape(name)  # escape name to avoid XSS
     # return different response according to the user's authentication status
+    is_login = session.get('logged_in')
+    print(is_login)
     if 'logged_in' in session:
         response += '[Authenticated]'
     else:
@@ -65,7 +71,8 @@ def teapot(drink):
 # 404
 @app.route('/404')
 def not_found():
-    abort(404)
+    # abort(404)
+    abort(Response('Hello World'))
 
 
 # return response with different formats
@@ -218,3 +225,21 @@ def redirect_back(default='hello', **kwargs):
         if is_safe_url(target):
             return redirect(target)
     return redirect(url_for(default, **kwargs))
+
+@app.route('/test')
+def test():
+    return jsonify(message='Error!'),500
+
+@app.route('/secret')
+def secret():
+    return app.secret_key
+
+@app.route('/getenv')
+def getenv():
+    return str(app.permanent_session_lifetime)
+
+
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000, debug=True)

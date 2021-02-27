@@ -9,7 +9,7 @@ import click
 from flask import Flask
 
 app = Flask(__name__)
-
+app.config['SECRET_KEY']='admin123456'
 
 # the minimal Flask application
 @app.route('/')
@@ -32,7 +32,10 @@ def greet(name):
 
 
 # custom flask cli command
-@app.cli.command()
+@app.cli.command('world')
 def hello():
     """Just say hello."""
     click.echo('Hello, Human!')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000, debug=True)
