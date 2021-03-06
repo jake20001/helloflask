@@ -45,7 +45,8 @@ def index():
 # register template context handler
 @app.context_processor
 def inject_info():
-    foo = 'I am foo.'
+    foo = 'I am fooxxxxxx.'
+    print(movies)
     return dict(foo=foo)  # equal to: return {'foo': foo}
 
 
@@ -58,13 +59,14 @@ def bar():
 # register template filter
 @app.template_filter()
 def musical(s):
+    print(s)
     return s + Markup(' &#9835;')
 
 
 # register template test
 @app.template_test()
 def baz(n):
-    if n == 'baz':
+    if n == 'bazx':
         return True
     return False
 
@@ -91,3 +93,7 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('errors/500.html'), 500
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000, debug=True)

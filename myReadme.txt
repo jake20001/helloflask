@@ -16,4 +16,11 @@ E:\flaskdemo\helloflask_jake\helloflask\demos\hello>flask run --host=0.0.0.0 --p
 2,内网穿透和访问工具：ngrok（https://ngrok.com/）, Localtunnel(https://localtunnel.github.io/www/)
 3,app.config['全大写']
 app.config['SECRET_KEY'] = 'admin123456'如何生效？
-4，
+
+
+
+
+
+
+addtions:
+1,http://api.jquery.com/

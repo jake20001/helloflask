@@ -15,7 +15,7 @@ except ImportError:
 
 from jinja2 import escape
 from jinja2.utils import generate_lorem_ipsum
-from flask import Flask, make_response, request, redirect, url_for, abort, session, jsonify, Response
+from flask import Flask, make_response, request, redirect, url_for, abort, session, jsonify, Response, g
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'secret string')
@@ -30,10 +30,11 @@ def hello():
     name = request.args.get('name')
     if name is None:
         name = request.cookies.get('name', 'Human')
-    response = '<h1>Hello, %s!</h1>' % escape(name)  # escape name to avoid XSS
+    # response = '<h1>Hello, %s!</h1>' % escape(name)  # escape name to avoid XSS
+    response = '<h1>Hello, %s!</h1>' % name
     # return different response according to the user's authentication status
     is_login = session.get('logged_in')
-    print(is_login)
+    print("111111111111",is_login)
     if 'logged_in' in session:
         response += '[Authenticated]'
     else:
@@ -162,8 +163,12 @@ def logout():
         session.pop('logged_in')
     return redirect(url_for('hello'))
 
+@app.route('/js')
+def js():
+    return 'E:/flaskdemo/helloflask_jake/helloflask/demos/http/jquery.min.js'
 
 # AJAX
+# <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 @app.route('/post')
 def show_post():
     post_body = generate_lorem_ipsum(n=2)
@@ -171,7 +176,7 @@ def show_post():
 <h1>A very long post</h1>
 <div class="body">%s</div>
 <button id="load">Load More</button>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 <script type="text/javascript">
 $(function() {
     $('#load').click(function() {
@@ -204,16 +209,23 @@ def bar():
     return '<h1>Bar page</h1><a href="%s">Do something and redirect</a>' \
            % url_for('do_something', next=request.full_path)
 
+# @app.route('/do-something')
+# def do_something():
+#     return redirect(request.args.get('next'))
+
 
 @app.route('/do-something')
 def do_something():
     # do something here
+    # return redirect(request.args.get('next'),url_for('hello'))
     return redirect_back()
 
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
+    print(ref_url.netloc)
     test_url = urlparse(urljoin(request.host_url, target))
+    print(test_url.netloc)
     return test_url.scheme in ('http', 'https') and \
            ref_url.netloc == test_url.netloc
 
@@ -236,10 +248,30 @@ def secret():
 
 @app.route('/getenv')
 def getenv():
+    print("222222222",g.name)
     return str(app.permanent_session_lifetime)
 
+@app.before_request
+def get_name():
+    g.name = request.args.get('name','haha')
+    print("3333333",g.name)
 
+@app.route('/test_context')
+def get_test_context():
+    with app.app_context():
+        name = request.cookies.get('name', 'Human')
+        print(name)
 
+    # current_app = app.app_context()
+    # print(current_app.g)
+    return 'OK'
+
+@app.route('/test_context2')
+def get_test_context2():
+    with app.test_request_context():
+        name = request.cookies.get('name', 'Human')
+        print(name)
+    return 'OK'
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+        app.run(host='0.0.0.0', port=8000, debug=True)

@@ -8,8 +8,14 @@
     <li><a href="{{ url_for('watchlist') }}">Watchlist</a></li>
     <li>Filter: {{ foo|musical }}</li>
     <li>Global: {{ bar() }}</li>
-    <li>Test: {% if name is baz %}I am baz.{% endif %}</li>
-    <li>Macro: {{ qux(amount=1) }}</li>
+    <li>Test:
+        {% if name is baz %}
+            I am baz.
+        {% else %}
+            I am bazx.
+        {% endif %}
+    </li>
+    <li>Macro: {{ qux(amount=2) }}</li>
     <li><a href="{{ url_for('watchlist_with_static') }}">Watchlist with image and styles.</a></li>
     <li><a href="{{ url_for('just_flash') }}">Flash something</a></li>
 </ul>
